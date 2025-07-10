@@ -1,0 +1,127 @@
+Service:
+  RegionId: cn-hangzhou
+  DeployType: ros
+  DeployMetadata:
+    ServiceInstanceNameRule:
+      Prefix: AIEnglishCoach
+    SupplierDeployMetadata:
+      ArtifactRelation:
+        'centos_7_9_x64_20G_alibase_20240403.vhd':
+          ArtifactId: ${Artifact.EcsImage.ArtifactId}
+          ArtifactVersion: ${Artifact.EcsImage.ArtifactVersion}
+    TemplateConfigs:
+      - Name: 单机版
+        Url: 'ros_templates/template.yaml'
+        AllowedRegions:
+          - ap-southeast-1
+  ServiceType: private
+  ServiceInfo:
+    Locale: zh-CN
+    ShortDescription: AIEnglishCoach deploy
+    Image: 'resources/icons/service_logo.png'
+Artifact:
+  EcsImage:
+    ArtifactType: EcsImage
+    ArtifactName: AIEnglishCoach
+    Description: AIEnglishCoach
+    ArtifactProperty:
+      RegionId: ${ImageBuilder.EcsImage.RegionId}
+      ImageId: ${ImageBuilder.EcsImage.SourceImageId}
+ImageBuilder:
+  EcsImage:
+    RegionId: ap-southeast-1
+    SupportRegionIds:
+      - ap-southeast-1
+    SourceImageId: aliyun_3_x64_20G_alibase_20240819.vhd
+    SystemDiskSize: 40
+    InstanceType: ecs.c6.large
+    InternetMaxBandwidthOut: 10
+    CommandType: RunShellScript
+    Timeout: 10800
+    Tags: [ ]
+    CommandContent: |-
+        #!/bin/bash
+        # 升级基础组件：
+        yum check-update
+        yum -y upgrade --security
+        yum -y upgrade-minimal
+
+        yum install -y nginx git
+        rm -rf /etc/nginx/nginx.conf
+        cat <<EOF > /etc/nginx/nginx.conf
+
+        user nginx;
+        worker_processes auto;
+        error_log /var/log/nginx/error.log;
+        pid /run/nginx.pid;
+
+        # Load dynamic modules. See /usr/share/doc/nginx/README.dynamic.
+        include /usr/share/nginx/modules/*.conf;
+
+        events {
+            worker_connections 1024;
+        }
+
+        http {
+            log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                              '$status $body_bytes_sent "$http_referer" '
+                              '"$http_user_agent" "$http_x_forwarded_for"';
+
+            access_log  /var/log/nginx/access.log  main;
+
+            sendfile            on;
+            tcp_nopush          on;
+            tcp_nodelay         on;
+            keepalive_timeout   65;
+            types_hash_max_size 4096;
+
+            include             /etc/nginx/mime.types;
+            default_type        application/octet-stream;
+
+            # Load modular configuration files from the /etc/nginx/conf.d directory.
+            # See http://nginx.org/en/docs/ngx_core_module.html#include
+            # for more information.
+            include /etc/nginx/conf.d/*.conf;
+
+            server {
+                listen       80;
+                listen       [::]:80;
+                server_name  _;
+                root         /usr/share/nginx/html;
+
+                # Load configuration files for the default server block.
+                include /etc/nginx/default.d/*.conf;
+
+                error_page 404 /404.html;
+                    location = /40x.html {
+                }
+
+                error_page 500 502 503 504 /50x.html;
+                    location = /50x.html {
+                }
+            }
+
+            server {
+                # HTTPS 配置
+                listen 443 ssl;
+                server_name public_ip;
+
+                # 自签名证书路径
+                ssl_certificate /etc/nginx/cert/my.crt;
+                ssl_certificate_key /etc/nginx/cert/my.key;
+                ssl_protocols TLSv1.2 TLSv1.3;
+
+                # 反向代理到 Java 应用（如 Tomcat、Spring Boot）
+            location / {
+                proxy_pass http://localhost:9000;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                }
+            }
+        EOF
+
+        mkdir /etc/nginx/cert
+
+        git clone https://github.com/KunSir991/ai-english-coach-h70g.git
