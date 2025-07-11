@@ -11,7 +11,7 @@ Service:
           ArtifactVersion: ${Artifact.EcsImage.ArtifactVersion}
     TemplateConfigs:
       - Name: 单机版
-        Url: 'ros_templates/template.yaml'
+        Url: 'templates/template.yaml'
         AllowedRegions:
           - ap-southeast-1
   ServiceType: private
