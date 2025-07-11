@@ -273,6 +273,48 @@ Resources:
           SourceCidrIp: 0.0.0.0/0
           IpProtocol: tcp
           NicType: internet
+  EcsRole:
+    Type: ALIYUN::RAM::Role
+    Properties:
+      RoleName:
+        Fn::Sub: HigressRole-${ALIYUN::StackId}
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - ecs.aliyuncs.com
+        Version: '1'
+      Policies:
+        - PolicyName:
+            Fn::Sub: HigressEcsPolicy-${ALIYUN::StackId}
+          PolicyDocument:
+            Statement:
+              - Action:
+                  - ram:CreateServiceLinkedRole
+                Resource:
+                  - '*'
+                Effect: Allow
+                Condition:
+                  StringEquals:
+                    ram:ServiceName:
+                      - supplier.computenest.aliyuncs.com
+              - Action:
+                  - ram:CreateServiceLinkedRole
+                Resource:
+                  - '*'
+                Effect: Allow
+                Condition:
+                  StringEquals:
+                    ram:ServiceName: cloudmonitor.aliyuncs.com
+              - Action:
+                  - ice:*
+                  - ram:GetRole
+                Resource:
+                  - '*'
+                Effect: Allow
+            Version: '1'
   InstanceGroup:
     Type: ALIYUN::ECS::InstanceGroup
     Properties:
@@ -303,7 +345,11 @@ Resources:
       InstanceType:
         Ref: EcsInstanceType
       SystemDiskCategory: cloud_essd
-      SystemDiskSize: 200
+      RamRoleName:
+        Fn::GetAtt:
+          - EcsRole
+          - RoleName
+      SystemDiskSize: 40
       InternetMaxBandwidthOut: 5
       IoOptimized: optimized
       MaxAmount: 1
@@ -323,7 +369,7 @@ Resources:
             #!/bin/bash
             cd /etc/nginx/cert
             sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout my.key -out my.crt -subj "/CN=${PublicIp}"
-            sed -i "s/server_name public_ip;/server_name $NEW_SERVER_NAME;/g" /etc/nginx/nginx.conf
+            sed -i "s/server_name public_ip;/server_name ${PublicIp};/g" /etc/nginx/nginx.conf
             systemctl enable --now nginx
 
             export LIVE_MIC_APP_ID=${LIVE_MIC_APP_ID}
@@ -331,6 +377,7 @@ Resources:
             export AI_AGENT_VOICE_CHAT_AI_AGENT_ID=${AI_AGENT_VOICE_CHAT_AI_AGENT_ID}
             export AI_AGENT_REGION=${AI_AGENT_REGION}
 
+            /root/ai-english-coach-h70g/bootstrap
 
           - AI_AGENT_REGION:
               Ref: ALIYUN::Region
