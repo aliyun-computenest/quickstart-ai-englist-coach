@@ -139,26 +139,6 @@ Parameters:
         InstanceTypeFamily:
           - ecs.u1
           - ecs.e
-    AllowedValues:
-      - ecs.u1-c1m2.xlarge
-      - ecs.u1-c1m4.xlarge
-      - ecs.u1-c1m8.xlarge
-      - ecs.u1-c1m1.2xlarge
-      - ecs.u1-c1m2.2xlarge
-      - ecs.u1-c1m4.2xlarge
-      - ecs.u1-c1m8.2xlarge
-      - ecs.u1-c1m1.3xlarge
-      - ecs.u1-c1m2.3xlarge
-      - ecs.u1-c1m4.3xlarge
-      - ecs.u1-c1m8.3xlarge
-      - ecs.u1-c1m1.4xlarge
-      - ecs.u1-c1m2.4xlarge
-      - ecs.u1-c1m4.4xlarge
-      - ecs.u1-c1m8.4xlarge
-      - ecs.u1-c1m1.8xlarge
-      - ecs.u1-c1m2.8xlarge
-      - ecs.u1-c1m4.8xlarge
-      - ecs.u1-c1m8.8xlarge
   InstancePassword:
     NoEcho: true
     Type: String
@@ -224,16 +204,25 @@ Parameters:
     Label:
       en: LIVE_MIC_APP_ID
       zh-cn: 实时音视频AppId
+    Description:
+      zh-cn: <a href="https://live.console.aliyun.com/?/liveRtc/list#/liveRtc/list"  target="_blank">获取实时音视频AppId</a>
+      en: <a href="https://live.console.aliyun.com/?/liveRtc/list#/liveRtc/list" target="_blank">Get real-time audio and video AppId</a>
   LIVE_MIC_APP_KEY:
     Type: String
     Label:
       en: LIVE_MIC_APP_KEY
       zh-cn: 实时音视频AppKey
+    Description:
+      zh-cn: <a href="https://live.console.aliyun.com/?/liveRtc/list#/liveRtc/list"  target="_blank">获取实时音视频AppKey</a>
+      en: <a href="https://live.console.aliyun.com/?/liveRtc/list#/liveRtc/list" target="_blank">Get real-time audio and video AppKey</a>
   AI_AGENT_VOICE_CHAT_AI_AGENT_ID:
     Type: String
     Label:
       en: AI_AGENT_VOICE_CHAT_AI_AGENT_ID
       zh-cn: 语音通话智能体的AgentId
+    Description:
+      zh-cn: <a href="https://ims.console.aliyun.com/ai/robot/list"  target="_blank">语音通话智能体的AgentId</a>
+      en: <a href="https://ims.console.aliyun.com/ai/robot/list" target="_blank">AgentId of voice call agent</a>
 Resources:
   # 新建vpc
   EcsVpc:
@@ -269,6 +258,11 @@ Resources:
           - Ref: VpcId
       SecurityGroupIngress:
         - PortRange: 443/443
+          Priority: 1
+          SourceCidrIp: 0.0.0.0/0
+          IpProtocol: tcp
+          NicType: internet
+        - PortRange: 22/22
           Priority: 1
           SourceCidrIp: 0.0.0.0/0
           IpProtocol: tcp
@@ -372,12 +366,18 @@ Resources:
             sed -i "s/server_name public_ip;/server_name ${PublicIp};/g" /etc/nginx/nginx.conf
             systemctl enable --now nginx
 
+            cat << EOF >> /root/ai-english-coach-h70g/start.sh
+            #!/bin/bash
             export LIVE_MIC_APP_ID=${LIVE_MIC_APP_ID}
             export LIVE_MIC_APP_KEY=${LIVE_MIC_APP_KEY}
             export AI_AGENT_VOICE_CHAT_AI_AGENT_ID=${AI_AGENT_VOICE_CHAT_AI_AGENT_ID}
             export AI_AGENT_REGION=${AI_AGENT_REGION}
+            cd /root/ai-english-coach-h70g/
+            ./bootstrap &
+            EOF
 
-            /root/ai-english-coach-h70g/bootstrap
+            chmod +x /root/ai-english-coach-h70g/start.sh
+            /root/ai-english-coach-h70g/start.sh
 
           - AI_AGENT_REGION:
               Ref: ALIYUN::Region
@@ -430,4 +430,71 @@ Metadata:
           - VSwitchCidrBlock
         Label:
           default: 可用区配置
-      
+    QuickDeployConfig:
+      PackageFields:
+        - Key: EcsInstanceType
+        - Key: SystemDiskCategory
+          Label:
+            zh-cn: 系统盘
+            en: System Disk
+          Value: 'ESSD Entry云盘 / 40 GB'
+        - Key: InternetChargeType
+          Label:
+            zh-cn: 公网带宽
+            en: Internet Charge Type
+          Value: '按固定带宽计费 / 3 Mbps'
+        - Key: PayType
+          Label:
+            zh-cn: 付费类型
+            en:  Pay Type
+          Value: '${PayType}'
+        - Key: PayPeriodUnit
+          Label:
+            zh-cn: 付费时长
+            en: Pay Period
+          Value: '${PayPeriod} ${PayPeriodUnit}'
+      PredefinedParameters:
+        - Name: 热卖套餐，特价99元/年（限购1台）
+          Parameters:
+            EcsInstanceType: ecs.e-c1m1.large
+            PayPeriodUnit: Month
+            PayPeriod: 12
+            PayType: PrePaid
+          OrderList:
+            - EcsInstanceType
+            - PayPeriodUnit
+            - PayPeriod
+            - PayType
+          Type: Normal
+          Description: 固定带宽不限流量，新老同享，上云首选！
+        - Name: 尝鲜套餐，只需0.3元/小时
+          Parameters:
+            EcsInstanceType: ecs.e-c1m1.large
+            PayPeriodUnit: Month
+            PayPeriod: 12
+            PayType: PostPaid
+          OrderList:
+            - EcsInstanceType
+            - PayPeriodUnit
+            - PayPeriod
+            - PayType
+          Type: Normal
+          Description: 可用300元学生专属代金券抵扣！<a href="https://university.aliyun.com" target="_blank">立即领取</a>
+        - Name: 自定义套餐
+          Parameters: {}
+          OrderList:
+            - EcsInstanceType
+            - PayPeriodUnit
+            - PayPeriod
+            - PayType
+          Type: Custom
+      CustomFields:
+        - Key: InstancePassword
+        - Key: LIVE_MIC_APP_ID
+        - Key: LIVE_MIC_APP_KEY
+        - Key: AI_AGENT_VOICE_CHAT_AI_AGENT_ID
+      CostRelatedKeys:
+        - RegionId
+        - PayPeriod
+      AutomaticZone:
+        ZoneIdKey: ZoneId

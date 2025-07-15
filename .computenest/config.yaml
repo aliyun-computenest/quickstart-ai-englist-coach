@@ -2,8 +2,6 @@ Service:
   RegionId: cn-hangzhou
   DeployType: ros
   DeployMetadata:
-    ServiceInstanceNameRule:
-      Prefix: AIEnglishCoach
     SupplierDeployMetadata:
       ArtifactRelation:
         'centos_7_9_x64_20G_alibase_20240403.vhd':
