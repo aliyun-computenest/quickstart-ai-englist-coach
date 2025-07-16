@@ -22,6 +22,10 @@ AI 陪练，作为智能化的专属训练伙伴，能够提供实时反馈与�
 | AliyunROSFullAccess             | 管理资源编排服务（ROS）的权限           |
 | AliyunComputeNestUserFullAccess | 管理计算巢服务（ComputeNest）的用户侧权限 |
 
+## 前置步骤
+
+请参考[解决方案](https://www.aliyun.com/solution/tech-solution-deploy/2861523?spm=a2c4g.2862596.0.0.76e6470a3GmDhZ)创建创建实时音视频通信应用、实时工作流和AI智能体。在后续的步骤中，需要使用到实时音视频AppId、实时音视频AppKey和语音通话智能体的AgentId。
+
 ## 部署服务
 
 1. 单击[部署链接](https://computenest.console.aliyun.com/service/simple/deploy?ServiceId=service-7986f4f24f504ceb9989)
