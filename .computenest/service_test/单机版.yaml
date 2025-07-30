@@ -1,0 +1,13 @@
+templateName: 单机版
+regionId: cn-hangzhou
+parameters:
+  VpcCidrBlock: "192.168.0.0/16"
+  LIVE_MIC_APP_ID: "Please fill in"
+  VpcOption: "NewVPC"
+  LIVE_MIC_APP_KEY: "Please fill in"
+  PayType: "PostPaid"
+  AI_AGENT_VOICE_CHAT_AI_AGENT_ID: "Please fill in"
+  EcsInstanceType: "$[iact3-auto]"
+  VSwitchCidrBlock: "192.168.1.0/24"
+  InstancePassword: "$[iact3-auto]"
+caseId: stc-469226185a1d485bae7b

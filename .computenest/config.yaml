@@ -8,15 +8,18 @@ Service:
           ArtifactId: ${Artifact.EcsImage.ArtifactId}
           ArtifactVersion: ${Artifact.EcsImage.ArtifactVersion}
     TemplateConfigs:
-      - Name: 单机版
-        Url: 'templates/template.yaml'
-        AllowedRegions:
-          - ap-southeast-1
+    - Name: 单机版
+      Url: 'templates/template.yaml'
+      AllowedRegions:
+      - ap-southeast-1
   ServiceType: private
   ServiceInfo:
-    Locale: zh-CN
-    ShortDescription: AIEnglishCoach deploy
-    Image: 'resources/icons/service_logo.png'
+  - Locale: zh-CN
+    Name: aliyun-computenest/quickstart-ai-englist-coach-qdil
+    ShortDescription: Service description
+    Image: 
+      https://service-info-public.oss-cn-hangzhou.aliyuncs.com/1853370294850618/service-image/bfd30cc4-e959-4093-b5cb-77a05058b911.png
+    Softwares: []
 Artifact:
   EcsImage:
     ArtifactType: EcsImage
@@ -29,91 +32,91 @@ ImageBuilder:
   EcsImage:
     RegionId: ap-southeast-1
     SupportRegionIds:
-      - ap-southeast-1
+    - ap-southeast-1
     SourceImageId: aliyun_3_x64_20G_alibase_20240819.vhd
     SystemDiskSize: 40
     InstanceType: ecs.c6.large
     InternetMaxBandwidthOut: 10
     CommandType: RunShellScript
     Timeout: 10800
-    Tags: [ ]
+    Tags: []
     CommandContent: |-
-        #!/bin/bash
-        # 升级基础组件：
-        yum check-update
-        yum -y upgrade --security
-        yum -y upgrade-minimal
+      #!/bin/bash
+      # 升级基础组件：
+      yum check-update
+      yum -y upgrade --security
+      yum -y upgrade-minimal
 
-        yum install -y nginx git java
-        rm -rf /etc/nginx/nginx.conf
-        cat >  /etc/nginx/nginx.conf << 'EOF'
+      yum install -y nginx git java
+      rm -rf /etc/nginx/nginx.conf
+      cat >  /etc/nginx/nginx.conf << 'EOF'
 
-        user nginx;
-        worker_processes auto;
-        error_log /var/log/nginx/error.log;
-        pid /run/nginx.pid;
+      user nginx;
+      worker_processes auto;
+      error_log /var/log/nginx/error.log;
+      pid /run/nginx.pid;
 
-        include /usr/share/nginx/modules/*.conf;
+      include /usr/share/nginx/modules/*.conf;
 
-        events {
-            worker_connections 1024;
-        }
+      events {
+          worker_connections 1024;
+      }
 
-        http {
-            log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                              '$status $body_bytes_sent "$http_referer" '
-                              '"$http_user_agent" "$http_x_forwarded_for"';
+      http {
+          log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                            '$status $body_bytes_sent "$http_referer" '
+                            '"$http_user_agent" "$http_x_forwarded_for"';
 
-            access_log  /var/log/nginx/access.log  main;
+          access_log  /var/log/nginx/access.log  main;
 
-            sendfile            on;
-            tcp_nopush          on;
-            tcp_nodelay         on;
-            keepalive_timeout   65;
-            types_hash_max_size 4096;
+          sendfile            on;
+          tcp_nopush          on;
+          tcp_nodelay         on;
+          keepalive_timeout   65;
+          types_hash_max_size 4096;
 
-            include             /etc/nginx/mime.types;
-            default_type        application/octet-stream;
-            include /etc/nginx/conf.d/*.conf;
+          include             /etc/nginx/mime.types;
+          default_type        application/octet-stream;
+          include /etc/nginx/conf.d/*.conf;
 
-            server {
-                listen       80;
-                listen       [::]:80;
-                server_name  _;
-                root         /usr/share/nginx/html;
+          server {
+              listen       80;
+              listen       [::]:80;
+              server_name  _;
+              root         /usr/share/nginx/html;
 
-                # Load configuration files for the default server block.
-                include /etc/nginx/default.d/*.conf;
+              # Load configuration files for the default server block.
+              include /etc/nginx/default.d/*.conf;
 
-                error_page 404 /404.html;
-                    location = /40x.html {
-                }
+              error_page 404 /404.html;
+                  location = /40x.html {
+              }
 
-                error_page 500 502 503 504 /50x.html;
-                    location = /50x.html {
-                }
-            }
+              error_page 500 502 503 504 /50x.html;
+                  location = /50x.html {
+              }
+          }
 
-            server {
-                listen 443 ssl;
-                server_name public_ip;
+          server {
+              listen 443 ssl;
+              server_name public_ip;
 
-                # 自签名证书路径
-                ssl_certificate /etc/nginx/cert/my.crt;
-                ssl_certificate_key /etc/nginx/cert/my.key;
-                ssl_protocols TLSv1.2 TLSv1.3;
+              # 自签名证书路径
+              ssl_certificate /etc/nginx/cert/my.crt;
+              ssl_certificate_key /etc/nginx/cert/my.key;
+              ssl_protocols TLSv1.2 TLSv1.3;
 
-            location / {
-                proxy_pass http://localhost:9000;
-                proxy_set_header Host $host;
-                proxy_set_header X-Real-IP $remote_addr;
-                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                proxy_set_header X-Forwarded-Proto $scheme;
-                }
-            }
-        }
-        EOF
+          location / {
+              proxy_pass http://localhost:9000;
+              proxy_set_header Host $host;
+              proxy_set_header X-Real-IP $remote_addr;
+              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto $scheme;
+              }
+          }
+      }
+      EOF
 
-        mkdir /etc/nginx/cert
+      mkdir /etc/nginx/cert
 
-        git clone https://github.com/KunSir991/ai-english-coach-h70g.git
+      git clone https://github.com/KunSir991/ai-english-coach-h70g.git
