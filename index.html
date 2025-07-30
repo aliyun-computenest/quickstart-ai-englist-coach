@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="计算巢是阿里云开放给企业应用服务商的服务管理平台。服务商能够在计算巢上发布私有化部署服务，为其客户提供云上软件一键部署的能力；同时也支持全托管模式的服务，赋能服务商托管其客户资源。">
+  <title>Home - Aliyun 计算巢 x Demo</title>
+
+  <link rel="shortcut icon" href="img/favicon.ico">
+
+  <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css">
+  <link rel="stylesheet" href="css/theme.css">
+  
+
+  
+
+  
+  
+
+  
+    <script src="search/main.js"></script>
+  
+
+  
+
+  <script src="js/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="nav-inner">
+        <div class="logo">
+          <img src="./img/logo-2x.png">
+        </div>
+        <div class="nav-list">
+          <ul>
+          
+              <li><a href="#_1">简介</a></li>
+              
+          
+              <li><a href="#_2">计费说明</a></li>
+              
+          
+              <li><a href="#ram">RAM账号所需权限</a></li>
+              
+          
+              <li><a href="#_3">前置准备</a></li>
+              
+          
+              <li><a href="#_4">部署服务</a></li>
+              
+          
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="content theme-github">
+      
+      <div class="content-inner">        
+        
+        <h2 id="_1">简介</h2>
+<p>AI 陪练，作为智能化的专属训练伙伴，能够提供实时反馈与精准指导，助力用户高效提升技能。本方案以英语口语教学和企业内部培训为应用场景，依托大模型技术，通过模拟真实对话场景，支持文本及语音交互，实现个性化学习与即时反馈，为用户打造沉浸式的学习体验。</p>
+<h2 id="_2">计费说明</h2>
+<p>本服务在阿里云上的费用主要涉及：</p>
+<ul>
+<li>所选GPU云服务器的规格</li>
+<li>磁盘容量</li>
+<li>公网带宽</li>
+</ul>
+<p>计费方式：按量付费（小时）或包年包月
+预估费用在创建实例时可实时看到。</p>
+<h2 id="ram">RAM账号所需权限</h2>
+<table>
+<thead>
+<tr>
+<th>权限策略名称</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AliyunECSFullAccess</td>
+<td>管理云服务器服务（ECS）的权限</td>
+</tr>
+<tr>
+<td>AliyunVPCFullAccess</td>
+<td>管理专有网络（VPC）的权限</td>
+</tr>
+<tr>
+<td>AliyunROSFullAccess</td>
+<td>管理资源编排服务（ROS）的权限</td>
+</tr>
+<tr>
+<td>AliyunComputeNestUserFullAccess</td>
+<td>管理计算巢服务（ComputeNest）的用户侧权限</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_3">前置准备</h2>
+<p>⚠️ <strong>重要</strong>：请先完成以下准备工作</p>
+<ol>
+<li>参考<a href="https://www.aliyun.com/solution/tech-solution-deploy/2861523?spm=a2c4g.2862596.0.0.76e6470a3GmDhZ">解决方案文档</a>创建：</li>
+<li>实时音视频通信应用</li>
+<li>实时工作流</li>
+<li>
+<p>AI智能体</p>
+</li>
+<li>
+<p>获取必要参数：</p>
+</li>
+<li>实时音视频 AppId</li>
+<li>实时音视频 AppKey  </li>
+<li>
+<p>语音通话智能体 AgentId</p>
+</li>
+<li>
+<p><strong>地域要求</strong>：所有资源必须创建在<strong>杭州地域</strong></p>
+</li>
+</ol>
+<h2 id="_4">部署服务</h2>
+<ol>
+<li>
+<p>单击<a href="https://computenest.console.aliyun.com/service/simple/deploy?ServiceId=service-7986f4f24f504ceb9989">部署链接</a>
+   ，进入服务实例部署界面，根据界面提示，填写参数。
+    <img alt="" src="result_1.jpg" /></p>
+</li>
+<li>
+<p>确认订单完成后点击<strong>立即创建</strong>，等待部署完成后进入服务实例详情。</p>
+</li>
+<li>
+<p>单击公网访问地址，在浏览器中，会自动跳转为 HTTPS 链接地址。提示安全证书警告或错误，可以选择点击高级选项，然后点击继续前往以访问该网站。
+    <img alt="" src="use_4.png" /></p>
+</li>
+<li>
+<p>选择您想要学习的场景和难度，开始对话互动。
+    <img alt="" src="use_1.png" /></p>
+</li>
+<li>
+<p>在每轮对话过程中，AI助手将根据您当前的回答提供评分，并给出针对性的学习建议，帮助您不断提升，期间可以使用Tab 键进行打断。</p>
+</li>
+</ol>
+<p>说明:浏览器弹窗请求使用麦克风，点击访问该网站时允许。</p>
+<pre><code>&lt;img alt="Description" src="use_2.png" width="400"/&gt;
+
+![](use_3.png)
+</code></pre>
+        
+      </div>
+
+      <div class="copyrights">© 2009-2022 Aliyun.com 版权所有</div>
+    </div>
+  </div>
+  
+  <!--
+  MkDocs version      : 1.6.1
+  Docs Build Date UTC : 2025-07-30 10:27:01.874471+00:00
+  -->
+</body>
+</html>
